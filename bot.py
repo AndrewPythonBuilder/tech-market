@@ -15,6 +15,7 @@ count = price = photo = description = title = Socket = adv_0 = adv_1 = delete_t 
 
 def start(bot,update):
     message = update.message
+    print(message.chat.id)
     if message.chat.id in constants.admins:
         global count, price, photo, description, title, Socket,adv_0, adv_1, delete_t, update_tov
         bottons = [['Товар','Реклама']]
@@ -49,7 +50,7 @@ def answer_questions(bot,update):
             bot.send_message(message.chat.id, text, reply_markup=keyboard)
 
         elif message.text == 'Добавить':
-            bottons = [['Материнская плата','Процессор', 'Оперативная память'],['HDD или SSD','Видеокарта','Система охлаждения'],
+            bottons = [['Материнская плата','Процессор', 'Оперативная память'],['HDD или SSD','Видеокарта','Охлаждение'],
                        ['Кейс'],['Мониторы'],['Клавиатуры','Мышки','Наушники'], ['Hub, Switch','Принтеры, сканеры, МФУ','Другие'],
                        ['Мобильные телефоны','Прочая электроника'],['Компьютеры'], ['Домой']]
             text = 'Выберите раздел'
@@ -124,11 +125,11 @@ def answer_questions(bot,update):
             bot.send_message(message.chat.id, text, reply_markup=keyboard)
             Socket = True
 
-        elif message.text == 'Система охлаждения':
+        elif message.text == 'Охлаждение':
             bottons = [['1-10$','10-30$'],['30-50$','50+$'], ['Домой']]
             keyboard = ReplyKeyboardMarkup(bottons, resize_keyboard=True)
-            text = 'Система охлаждения'
-            base_w.save_type('Система охлаждения')
+            text = 'Охлаждение'
+            base_w.save_type('Охлаждение')
             bot.send_message(message.chat.id, text, reply_markup=keyboard)
             Socket = True
 
@@ -415,14 +416,14 @@ def answer_questions(bot,update):
 
         elif message.text == 'Intel':
             bottons = [['Socket 775'], ['Socket 1155'], ['Socket 1150'], ['Socket 1151'], ['Socket 1156'],
-                       ['Socket 1366'], ['Socket 2011']]
+                       ['Socket 1366'], ['Socket 2011'], ['Домой']]
             keyboard = ReplyKeyboardMarkup(bottons, resize_keyboard=True)
             text = 'Выберите желаемый Socket'
             bot.send_message(message.chat.id, text, reply_markup=keyboard)
 
         elif message.text == 'AMD':
             bottons = [['Socket AM4+'], ['Socket TR4'], ['Socket AM4'], ['Socket AM3+'], ['Socket AM3'],
-                       ['Socket AM2+'], ['Socket AM2']]
+                       ['Socket AM2+'], ['Socket AM2'],['Домой']]
             keyboard = ReplyKeyboardMarkup(bottons, resize_keyboard=True)
             text = 'Выберите желаемый Socket'
             bot.send_message(message.chat.id, text, reply_markup=keyboard)
@@ -460,15 +461,15 @@ def answer_questions(bot,update):
             bot.send_message(message.chat.id, text, reply_markup=keyboard)
 
         elif message.text == 'Видеокарта':
-            bottons = [['1-50$', '50-200$'], ['200-500$', '500+$'], ['Далее к разделу "Система охлаждения"','Домой']]
+            bottons = [['1-50$', '50-200$'], ['200-500$', '500+$'], ['Далее к разделу "Охлаждение"','Домой']]
             keyboard = ReplyKeyboardMarkup(bottons, resize_keyboard=True)
             text = 'Видеокарта'
             bot.send_message(message.chat.id, text, reply_markup=keyboard)
 
-        elif message.text == 'Система охлаждения':
+        elif message.text == 'Охлаждение':
             bottons = [['1-10$', '10-30$'], ['30-50$', '50+$'], ['Далее к разделу "Кейс"','Домой']]
             keyboard = ReplyKeyboardMarkup(bottons, resize_keyboard=True)
-            text = 'Система охлаждения'
+            text = 'Охлаждение'
             bot.send_message(message.chat.id, text, reply_markup=keyboard)
 
 
@@ -499,6 +500,12 @@ def answer_questions(bot,update):
         elif message.text == 'Корзина':
             message.text = '/basket'
             basket(bot, update)
+
+        elif message.text == 'Очистить корзину':
+            base_w.clear_basket(message.chat.id)
+            bot.send_message(message.chat.id, 'Корзина очищена')
+            message.text ='/start'
+            start(bot,update)
 
         elif message.text.replace('Добавить в корзину','')[0] == ' ':
             title_is = message.text.replace('Добавить в корзину ','')
@@ -552,6 +559,7 @@ def answer_questions(bot,update):
                     bottons = []
                     for i in l[:-1]:
                         bottons.append([i[3]])
+                    bottons.append(['Домой'])
                     keyboard = ReplyKeyboardMarkup(bottons, resize_keyboard=True)
                     text = 'Выберите продукт:'
                 elif l[-1] == 'Product':
@@ -560,13 +568,13 @@ def answer_questions(bot,update):
                     text = 'Добавьте продукт в корзину\n'+str(l[3])+'\nОписание: '+str(l[4])+'\nЦена: '+str(l[6])+'$'
                     keyboard = ReplyKeyboardMarkup(bottons, resize_keyboard=True)
                     bot.send_photo(message.chat.id, photo = l[5].split('@#$%$#')[0] )
-                elif l == None:
-                    text = 'Товара пока нет в наличии'
+                elif l == 'None':
+                    text = 'Этот товар в данный момент отсутствует'
                     bottons = [['Домой']]
                     keyboard = ReplyKeyboardMarkup(bottons, resize_keyboard=True)
                 bot.send_message(message.chat.id, text, reply_markup=keyboard)
             except:
-                bot.send_message(message.chat.id, 'Я не знаю такую команду')
+                bot.send_message(message.chat.id, 'Этот товар в данный момент отсутствует')
 
 
 
@@ -649,7 +657,7 @@ def basket(bot,update):
         for i in range(len(spisok)):
             text_is += str(i+1)+'. '+base_w.title_from_ID(int(spisok[i].split('+')[0]))+' Кол-во: '+ str(spisok[i].split('+')[1]) +' шт.\n'
         bot.send_message(message.chat.id, 'Корзина:')
-        bottons = [['Удалить единицу','Оформить заказ'], ['Домой']]
+        bottons = [['Удалить единицу','Оформить заказ'], ['Очистить корзину'],['Домой']]
         keyboard = ReplyKeyboardMarkup(bottons, resize_keyboard=True)
         bot.send_message(message.chat.id, str(text_is), reply_markup=keyboard)
 

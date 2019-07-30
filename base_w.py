@@ -371,7 +371,7 @@ def price_info(ID):
 
     for i in range(len(spisok)):
         ID_p = int(spisok[i].split('+')[0])
-        count = spisok[i].split('+')[0]
+        count = spisok[i].split('+')[1]
         nicks.append([title_from_ID(ID_p), count , str(price_from_ID(ID_p))])
 
     return nicks
